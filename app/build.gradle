@@ -13,6 +13,14 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        // convert the value defined in gradle properties to a filed of BuildConfig
+        // if the properties are not defined, "NOT_FOUND" will be assigned BuildConfig
+        buildConfigField "String", "GITHUB_CLIENT_ID",
+                project.properties["GITHUB_CLIENT_ID"] ?: "\"NOT_FOUND\""
+
+        buildConfigField "String", "GITHUB_CLIENT_SECRET",
+                project.properties["GITHUB_CLIENT_SECRET"] ?: "\"NOT_FOUND\""
     }
     buildTypes {
         release {
