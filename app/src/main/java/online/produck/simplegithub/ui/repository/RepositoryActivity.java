@@ -76,7 +76,7 @@ public class RepositoryActivity extends AppCompatActivity {
         pbProgress = findViewById(R.id.pbActivityRepository);
         tvMessage = findViewById(R.id.tvActivityRepositoryMessage);
 
-        api = GithubApiProvider.provideGithubApi(this);
+        api = GithubApiProvider.INSTANCE.provideGithubApi(this);
 
         String login = getIntent().getStringExtra(KEY_USER_LOGIN);
         if (null == login) {
@@ -103,26 +103,26 @@ public class RepositoryActivity extends AppCompatActivity {
                 GithubRepo repo = response.body();
                 if (response.isSuccessful() && null != repo) {
                     Glide.with(RepositoryActivity.this)
-                            .load(repo.owner.avatarUrl)
+                            .load(repo.getOwner().getAvatarUrl())
                             .into(ivProfile);
 
-                    tvName.setText(repo.fullName);
+                    tvName.setText(repo.getFullName());
                     tvStars.setText(getResources()
-                        .getQuantityString(R.plurals.star, repo.stars, repo.stars));
+                        .getQuantityString(R.plurals.star, repo.getStars(), repo.getStars()));
 
-                    if (null == repo.description) {
+                    if (null == repo.getDescription()) {
                         tvDescription.setText(R.string.no_description_provided);
                     } else {
-                        tvDescription.setText(repo.description);
+                        tvDescription.setText(repo.getDescription());
                     }
-                    if (null == repo.language) {
+                    if (null == repo.getLanguage()) {
                         tvLanguage.setText(R.string.no_language_specified);
                     } else {
-                        tvLanguage.setText(repo.language);
+                        tvLanguage.setText(repo.getLanguage());
                     }
 
                     try {
-                        Date lastUpdate = dateFormatIntResponse.parse(repo.updatedAt);
+                        Date lastUpdate = dateFormatIntResponse.parse(repo.getUpdatedAt());
                         tvLastUpdates.setText(dateFormatToShow.format(lastUpdate));
                     } catch (ParseException e) {
                         tvLastUpdates.setText(getString(R.string.unknown));
