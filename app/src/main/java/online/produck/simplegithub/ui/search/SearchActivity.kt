@@ -21,6 +21,7 @@ import online.produck.simplegithub.api.GithubApiProvider
 import online.produck.simplegithub.api.model.GithubRepo
 import online.produck.simplegithub.api.model.RepoSearchResponse
 import online.produck.simplegithub.ui.repository.RepositoryActivity
+import org.jetbrains.anko.startActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -131,7 +132,7 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.ItemClickListener {
     }
 
     private fun hideSoftKeyboard() {
-        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager?
         imm?.hideSoftInputFromWindow(searchView.windowToken, 0)
     }
 
@@ -143,9 +144,9 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.ItemClickListener {
     }
 
     override fun onItemClick(repository: GithubRepo) {
-        val intent = Intent(this, RepositoryActivity::class.java)
-        intent.putExtra(RepositoryActivity.KEY_USER_LOGIN, repository.owner.login)
-        intent.putExtra(RepositoryActivity.KEY_REPO_NAME, repository.name)
-        startActivity(intent)
+        startActivity<RepositoryActivity>(
+                RepositoryActivity.KEY_USER_LOGIN to repository.owner.login,
+                RepositoryActivity.KEY_REPO_NAME to repository.name
+        )
     }
 }

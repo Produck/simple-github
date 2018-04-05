@@ -14,4 +14,5 @@ ext {
     okHttpVersion = '3.8.1'
     retrofitVersion = '2.3.0'
     supportLibVersion = '27.1.0'
+    ankoVersion = '0.10.2'
 }
