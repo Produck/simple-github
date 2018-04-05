@@ -1,5 +1,6 @@
 package online.produck.simplegithub.api
 
+import io.reactivex.Observable
 import online.produck.simplegithub.api.model.GithubAccessToken
 import retrofit2.Call
 import retrofit2.http.Field
@@ -17,5 +18,5 @@ interface AuthApi {
             @Field("client_id") clientId: String,
             @Field("client_secret") clientSecret: String,
             @Field("code") code: String
-    ): Call<GithubAccessToken>
+    ): Observable<GithubAccessToken>
 }

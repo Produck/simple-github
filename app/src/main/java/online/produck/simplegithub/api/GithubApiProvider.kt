@@ -1,18 +1,15 @@
 package online.produck.simplegithub.api
 
 import android.content.Context
-
-import java.io.IOException
-
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.Request
 import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import online.produck.simplegithub.data.AuthTokenProvider
-import online.produck.simplegithub.ui.search.SearchActivity
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.IOException
 
 object GithubApiProvider {
 
@@ -20,6 +17,7 @@ object GithubApiProvider {
         return Retrofit.Builder()
                 .baseUrl("https://github.com")
                 .client(provideOkHttpClient(provideLoggingInterceptor(), null))
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.createAsync())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
                 .create(AuthApi::class.java)
@@ -49,6 +47,7 @@ object GithubApiProvider {
                 .baseUrl("https://api.github.com/")
                 .client(provideOkHttpClient(provideLoggingInterceptor(),
                         provideAuthInterceptor(provideAuthTokenProvider(context))))
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.createAsync())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
                 .create(GithubApi::class.java)

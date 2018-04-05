@@ -13,6 +13,9 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ProgressBar
 import android.widget.TextView
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_search.*
 
 import online.produck.simplegithub.R
@@ -20,6 +23,7 @@ import online.produck.simplegithub.api.GithubApi
 import online.produck.simplegithub.api.GithubApiProvider
 import online.produck.simplegithub.api.model.GithubRepo
 import online.produck.simplegithub.api.model.RepoSearchResponse
+import online.produck.simplegithub.plusAssign
 import online.produck.simplegithub.ui.repository.RepositoryActivity
 import org.jetbrains.anko.startActivity
 import retrofit2.Call
@@ -36,7 +40,7 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.ItemClickListener {
 
     internal lateinit var api: GithubApi
 
-    internal lateinit var searchCall: Call<RepoSearchResponse>
+    internal val disposable = CompositeDisposable()
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_activity_search, menu)
@@ -78,30 +82,31 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.ItemClickListener {
         hideError()
         showProgress()
 
-        searchCall = api.searchRepository(query)
-
-        searchCall.enqueue(object : Callback<RepoSearchResponse> {
-            override fun onResponse(call: Call<RepoSearchResponse>, response: Response<RepoSearchResponse>) {
-                hideProgress()
-
-                val searchResult = response.body()
-                if (response.isSuccessful && null != searchResult) {
-                    adapter.setItems(searchResult.items)
-                    adapter.notifyDataSetChanged()
-
-                    if (0 == searchResult.totalCount) {
-                        showError(getString(R.string.no_search_result))
+        disposable += (api.searchRepository(query)
+                .flatMap {
+                    if (0 == it.totalCount) {
+                        Observable.error(IllegalStateException("No search result"))
+                    } else {
+                        Observable.just(it.items)
                     }
-                } else {
-                    showError("Not successful: " + response.message())
                 }
-            }
-
-            override fun onFailure(call: Call<RepoSearchResponse>, t: Throwable) {
-                hideProgress()
-                showError(t.message)
-            }
-        })
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe {
+                    clearResults()
+                    hideError()
+                    showProgress()
+                }
+                .doOnTerminate {
+                    hideProgress()
+                }
+                .subscribe({ items ->
+                    with (adapter) {
+                        setItems(items)
+                        notifyDataSetChanged()
+                    }
+                }) {
+                    showError(it.message)
+                })
     }
 
     private fun showProgress() {
@@ -148,5 +153,11 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.ItemClickListener {
                 RepositoryActivity.KEY_USER_LOGIN to repository.owner.login,
                 RepositoryActivity.KEY_REPO_NAME to repository.name
         )
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        disposable.clear()
     }
 }
