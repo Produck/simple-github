@@ -5,16 +5,12 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import com.bumptech.glide.Glide
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_repository.*
 import online.produck.simplegithub.R
 import online.produck.simplegithub.api.GithubApi
 import online.produck.simplegithub.api.GithubApiProvider
-import online.produck.simplegithub.api.model.GithubRepo
-import online.produck.simplegithub.plusAssign
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import online.produck.simplegithub.extensions.plusAssign
+import online.produck.simplegithub.rx.AutoClearedDisposable
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -23,7 +19,7 @@ class RepositoryActivity : AppCompatActivity() {
 
     internal lateinit var api: GithubApi
 
-    internal val disposable = CompositeDisposable()
+    internal val disposable = AutoClearedDisposable(this)
 
     internal val dateFormatIntResponse = SimpleDateFormat(
             "yyyy-MM-dd 'T' HH:mm:ssX", Locale.getDefault()
@@ -98,12 +94,6 @@ class RepositoryActivity : AppCompatActivity() {
             text = message ?: "Unexpected error."
             visibility = View.VISIBLE
         }
-    }
-
-    override fun onStop() {
-        super.onStop()
-
-        disposable.clear()
     }
 
     companion object {

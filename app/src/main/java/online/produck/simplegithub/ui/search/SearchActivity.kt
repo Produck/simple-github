@@ -11,14 +11,14 @@ import android.view.inputmethod.InputMethodManager
 import com.jakewharton.rxbinding2.support.v7.widget.queryTextChangeEvents
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_search.*
 import online.produck.simplegithub.R
 import online.produck.simplegithub.api.GithubApi
 import online.produck.simplegithub.api.GithubApiProvider
 import online.produck.simplegithub.api.model.GithubRepo
-import online.produck.simplegithub.plusAssign
+import online.produck.simplegithub.extensions.plusAssign
 import online.produck.simplegithub.ui.repository.RepositoryActivity
+import online.produck.simplegithub.rx.AutoClearedDisposable
 import org.jetbrains.anko.startActivity
 
 class SearchActivity : AppCompatActivity(), SearchAdapter.ItemClickListener {
@@ -31,9 +31,9 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.ItemClickListener {
 
     internal lateinit var api: GithubApi
 
-    internal val disposable = CompositeDisposable()
+    internal val disposable = AutoClearedDisposable(this)
 
-    internal val viewDisposable = CompositeDisposable()
+    internal val viewDisposable = AutoClearedDisposable(this, alwaysClearOnStop = false)
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_activity_search, menu)
@@ -145,15 +145,5 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.ItemClickListener {
                 RepositoryActivity.KEY_USER_LOGIN to repository.owner.login,
                 RepositoryActivity.KEY_REPO_NAME to repository.name
         )
-    }
-
-    override fun onStop() {
-        super.onStop()
-
-        disposable.clear()
-
-        if (isFinishing) {
-            viewDisposable.clear()
-        }
     }
 }

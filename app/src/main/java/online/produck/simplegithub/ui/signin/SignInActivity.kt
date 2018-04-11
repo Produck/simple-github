@@ -6,39 +6,34 @@ import android.os.Bundle
 import android.support.customtabs.CustomTabsIntent
 import android.support.v7.app.AppCompatActivity
 import android.view.View
-import android.widget.Button
-import android.widget.ProgressBar
-import android.widget.Toast
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_sign_in.*
 
 import online.produck.simplegithub.BuildConfig
 import online.produck.simplegithub.R
 import online.produck.simplegithub.api.AuthApi
 import online.produck.simplegithub.api.GithubApiProvider
-import online.produck.simplegithub.api.model.GithubAccessToken
 import online.produck.simplegithub.data.AuthTokenProvider
-import online.produck.simplegithub.plusAssign
+import online.produck.simplegithub.extensions.plusAssign
 import online.produck.simplegithub.ui.main.MainActivity
+import online.produck.simplegithub.rx.AutoClearedDisposable
 import org.jetbrains.anko.clearTask
 import org.jetbrains.anko.intentFor
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.newTask
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class SignInActivity : AppCompatActivity() {
 
     internal lateinit var api: AuthApi
     internal lateinit var authTokenProvider: AuthTokenProvider
 
-    internal var disposables = CompositeDisposable()
+    internal var disposables = AutoClearedDisposable(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_in)
+
+        lifecycle += disposables
 
         btnActivitySignInStart.setOnClickListener {
             // create a URL which process user authentication
@@ -106,11 +101,5 @@ class SignInActivity : AppCompatActivity() {
 
     private fun launchMainActivity() {
         startActivity(intentFor<MainActivity>().clearTask().newTask())
-    }
-
-    override fun onStop() {
-        super.onStop()
-
-        disposables.clear()
     }
 }

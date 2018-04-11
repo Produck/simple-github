@@ -1,20 +1,20 @@
 ext {
     // Build configuration
-    buildToolsVersion = "27.1.0"
+    buildToolsVersion = "27.1.1"
     minSdkVersion = 16
     compileSdkVersion = 27
     targetSdkVersion = 27
 
     // Plugin
     androidPluginVersion = '3.0.1'
-    archComponentVersion = '1.0.0'
+    archComponentVersion = '1.1.1'
 
     // Library
     glideVersion = '4.1.1'
     gsonVersion = '2.7'
     okHttpVersion = '3.8.1'
     retrofitVersion = '2.3.0'
-    supportLibVersion = '27.1.0'
+    supportLibVersion = '27.1.1'
     ankoVersion = '0.10.2'
     rxAndroidVersion = '2.0.1'
     rxJavaVersion = '2.1.3'
