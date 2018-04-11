@@ -7,6 +7,7 @@ ext {
 
     // Plugin
     androidPluginVersion = '3.0.1'
+    archComponentVersion = '1.0.0'
 
     // Library
     glideVersion = '4.1.1'
