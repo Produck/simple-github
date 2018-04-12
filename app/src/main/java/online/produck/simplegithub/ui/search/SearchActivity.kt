@@ -9,14 +9,19 @@ import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import com.jakewharton.rxbinding2.support.v7.widget.queryTextChangeEvents
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_search.*
 import online.produck.simplegithub.R
 import online.produck.simplegithub.api.GithubApi
 import online.produck.simplegithub.api.GithubApiProvider
 import online.produck.simplegithub.api.model.GithubRepo
+import online.produck.simplegithub.data.SearchHistoryDao
+import online.produck.simplegithub.data.provideSearchHistoryDao
 import online.produck.simplegithub.extensions.plusAssign
+import online.produck.simplegithub.extensions.runOnIoScheduler
 import online.produck.simplegithub.ui.repository.RepositoryActivity
 import online.produck.simplegithub.rx.AutoClearedDisposable
 import org.jetbrains.anko.startActivity
@@ -34,6 +39,8 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.ItemClickListener {
     internal val disposable = AutoClearedDisposable(this)
 
     internal val viewDisposable = AutoClearedDisposable(this, alwaysClearOnStop = false)
+
+    internal val searchHistoryDao by lazy { provideSearchHistoryDao(this) }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_activity_search, menu)
@@ -141,6 +148,9 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.ItemClickListener {
     }
 
     override fun onItemClick(repository: GithubRepo) {
+
+        disposable += runOnIoScheduler { searchHistoryDao.add(repository) }
+
         startActivity<RepositoryActivity>(
                 RepositoryActivity.KEY_USER_LOGIN to repository.owner.login,
                 RepositoryActivity.KEY_REPO_NAME to repository.name

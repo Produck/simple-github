@@ -17,4 +17,5 @@
     <string name="repo_description">repo_description</string>
     <string name="repo_last_update">repo_last_update</string>
     <string name="repo_language">repo_language</string>
+    <string name="clear_all">Clear All</string>
 </resources>
